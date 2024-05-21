@@ -1,19 +1,20 @@
 comet_ml==3.37.1
 matplotlib==3.5.2
 numpy==1.19.5
-numpy==1.24.2
-numpy==1.18.5
-numpy==1.21.5
+# numpy==1.24.2
+# numpy==1.18.5
+# numpy==1.21.5
 Pillow==8.1.0
-Pillow==9.4.0
-Pillow==9.2.0
-Pillow==10.3.0
-torch==1.10.2
+# Pillow==9.4.0
+# Pillow==9.2.0
+# Pillow==10.3.0
+# torch==1.10.2
 torch==2.0.0
-torch==2.0.0+cu118
+# pytorch-cuda==11.8
 torch_summary==1.4.5
-torchvision==0.11.3
-torchvision==0.15.0
-torchvision==0.15.1+cu118
+# torchvision==0.11.3
+# torchvision==0.15.0
+# torchvision==0.15.1+cu118
 tqdm==4.65.0
-tqdm==4.64.1
+# tqdm==4.64.1
+chardet-normalizer
