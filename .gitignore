@@ -1,2 +1,5 @@
 Dataset/
 checkpoints/
+Dataset
+checkpoints
+Dataset/train/lena.jpg
