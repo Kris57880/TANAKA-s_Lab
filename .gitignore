@@ -3,3 +3,6 @@ checkpoints/
 Dataset
 checkpoints
 Dataset/train/lena.jpg
+Dataset/train/lena.jpg
+result/
+result
