@@ -5,5 +5,4 @@ checkpoints
 Dataset/train/lena.jpg
 Dataset/train/lena.jpg
 result/
-result
-/_pychache_
+__pycache__/
