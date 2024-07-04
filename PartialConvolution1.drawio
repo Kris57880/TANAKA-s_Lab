@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-07-02T13:27:29.231Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0" etag="yonW2mZlusdehKYYFow2" version="24.6.3" type="github">
+<mxfile host="app.diagrams.net" modified="2024-07-04T21:19:54.221Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0" etag="v1dmZtD3IZ2YhrPaDTQ2" version="24.6.3" type="github">
   <diagram name="第 1 页" id="LbZqLQVJRfLmjkdFLSAy">
-    <mxGraphModel dx="1396" dy="826" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="2040" dy="1208" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -4036,8 +4036,8 @@
         <mxCell id="UiO1FZ74wHxdK_iaMm12-143" value="w/o Norm w/o Bias" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
           <mxGeometry x="1152" y="2363" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="UiO1FZ74wHxdK_iaMm12-144" value="L1 Loss (Regularization Term)" style="text;html=1;align=center;verticalAlign=middle;resizable=1;points=[];autosize=1;strokeColor=none;fillColor=none;movable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
-          <mxGeometry x="1850.0049152542374" y="2238.48" width="180" height="30" as="geometry" />
+        <mxCell id="UiO1FZ74wHxdK_iaMm12-144" value="L1 Loss (Regularization Term)&lt;div&gt;divide by sparse mask norm&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=1;points=[];autosize=1;strokeColor=none;fillColor=none;movable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
+          <mxGeometry x="1850.0049152542374" y="2233.48" width="180" height="40" as="geometry" />
         </mxCell>
         <mxCell id="UiO1FZ74wHxdK_iaMm12-148" value="Huber Loss (L_R)" style="text;html=1;align=center;verticalAlign=middle;resizable=1;points=[];autosize=1;strokeColor=none;fillColor=none;movable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
           <mxGeometry x="2445.003898305085" y="2580" width="120" height="30" as="geometry" />
@@ -4247,6 +4247,12 @@
         <mxCell id="UiO1FZ74wHxdK_iaMm12-223" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="UiO1FZ74wHxdK_iaMm12-206" target="UiO1FZ74wHxdK_iaMm12-222">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="2110" y="2450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UiO1FZ74wHxdK_iaMm12-225" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.442;entryY=1.001;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="UiO1FZ74wHxdK_iaMm12-205" target="UiO1FZ74wHxdK_iaMm12-144">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2295" y="2500" as="sourcePoint" />
+            <mxPoint x="2295" y="2540" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>
