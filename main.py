@@ -3,29 +3,94 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torch.optim as optim
 from dataloader import CustomDataset 
-from models import SimpleNet, ResNet, ResNet_PCA
+from models import SimpleNet_no_PConv, SimpleNet, ResNet, ResNet_PCA, ResNet_PCA_Sparse_Mask
 from utils import load_checkpoint, find_latest_checkpoint
+# from train_test_simple import train , test  #for simple network 
 from train_test import train , test 
-from loss import SCLoss
+from loss import SCLoss, SCLoss_PCA, SCLoss_PCA_Sparse_Mask
 import os 
 from line_notify import send_message    
 
-for i in [5e-5]:
+exp0 = {
+    'model_name' : 'ResNet_PCA_Sparse_Mask',
+    'side_info' : f'4_ch_lambda_{1e-3}',
+    'epoch' : 175, 
+    'lmbda' : 1e-3, 
+    'delta' : 0.04,
+    'blur_kernel' : 7, 
+    'blur_sigma': 7, 
+    'lr' : 1e-4, 
+    'n_res_block' : 34,
+    'n_pca_channel' :4, 
+    # 'ExperimentName': 'DIV2K',
+    'load_checkpoint' : True,
+    'experiment_name' : None
+}
+exp1 = {
+    'model_name' : 'ResNet_PCA_Sparse_Mask',
+    'side_info' : f'1_ch_lambda_{1e-3}',
+    'epoch' : 175, 
+    'lmbda' : 1e-3, 
+    'delta' : 0.04,
+    'blur_kernel' : 7, 
+    'blur_sigma': 7, 
+    'lr' : 1e-4, 
+    'n_res_block' : 34,
+    'n_pca_channel' :1, 
+    # 'ExperimentName': 'DIV2K',
+    'load_checkpoint' : True,
+    'experiment_name' : None
+}
+
+exp2 = {
+    'model_name' : 'ResNet_PCA_Sparse_Mask',
+    'side_info' : f'4_ch_lambda_{5e-4}',
+    'epoch' : 175, 
+    'lmbda' : 5e-4, 
+    'delta' : 0.04,
+    'blur_kernel' : 7, 
+    'blur_sigma': 7, 
+    'lr' : 1e-4, 
+    'n_res_block' : 34,
+    'n_pca_channel' :4, 
+    # 'ExperimentName': 'DIV2K',
+    'load_checkpoint' : True,
+    'experiment_name' : None
+}
+exp3 = {
+    'model_name' : 'SimpleNet_no_PConv',
+    'side_info' : f'lambda_{1e-5}',
+    'epoch' : 100, 
+    'lmbda' : 1e-5, 
+    'delta' : 0.04,
+    'blur_kernel' : 7, 
+    'blur_sigma': 7, 
+    'lr' : 1e-4, 
+    'n_res_block' : 34,
+    'n_pca_channel' :4, 
+    # 'ExperimentName': 'DIV2K',
+    'load_checkpoint' : True,
+    'experiment_name' : None
+}
+exp4 = {
+    'model_name' : 'SimpleNet',
+    'side_info' : f'lambda_{1e-5}',
+    'epoch' : 100, 
+    'lmbda' : 1e-5, 
+    'delta' : 0.04,
+    'blur_kernel' : 7, 
+    'blur_sigma': 7, 
+    'lr' : 1e-4, 
+    'n_res_block' : 34,
+    'n_pca_channel' :4, 
+    # 'ExperimentName': 'DIV2K',
+    'load_checkpoint' : True,
+    'experiment_name' : None
+}
+
+for hyperparams in [exp3,exp4]:
     #hyperparams 
-    hyperparams = {
-        'model_name' : 'ResNet_PCA_1',
-        'epoch' : 101, 
-        'lmbda' : i, 
-        'delta' : 0.04,
-        'blur_kernel' : 7, 
-        'blur_sigma': 7, 
-        'lr' : 1e-4, 
-        'n_res_block' : 18,
-        # 'ExperimentName': 'DIV2K',
-        'load_checkpoint' : True,
-        'experiment_name' : None
-    }
-    hyperparams['experiment_name'] = f'{hyperparams["model_name"]}_lambda_{hyperparams["lmbda"]}_delta_{hyperparams["delta"]}'
+    hyperparams['experiment_name'] = f'{hyperparams["model_name"]}_{hyperparams["side_info"]}'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f'Train on {device}')
 
@@ -34,7 +99,7 @@ for i in [5e-5]:
     test_set = CustomDataset(root_dir=r'Dataset\DIV2K_valid_HR_bw',  mode = 'test', blur_kernel = hyperparams['blur_kernel'], blur_sigma = hyperparams['blur_sigma'])
     test_dataloader = DataLoader(test_set, batch_size=1, shuffle=False)
 
-    folder_name = f'checkpoints/{hyperparams["experiment_name"]}_{hyperparams["n_res_block"]}'
+    folder_name = f'checkpoints/{hyperparams["experiment_name"]}'
     test_result_path = os.path.join(folder_name, 'result')
 
     if not os.path.exists(folder_name):
@@ -45,13 +110,22 @@ for i in [5e-5]:
         model = ResNet(n_res_block=hyperparams['n_res_block']).to(device)
     elif hyperparams['model_name'] == 'SimpleNet':
         model = SimpleNet().to(device)
+    elif hyperparams['model_name'] == 'SimpleNet_no_PConv':
+        model = SimpleNet_no_PConv().to(device)
     elif hyperparams['model_name'] == 'ResNet_PCA':
-        model = ResNet_PCA(n_res_block=hyperparams['n_res_block']).to(device)
-    elif hyperparams['model_name'] == 'ResNet_PCA_1':
-        model = ResNet_PCA(n_res_block=hyperparams['n_res_block']).to(device)
-        
+        model = ResNet_PCA(n_res_block=hyperparams['n_res_block'], pca_channel= hyperparams['n_pca_channel']).to(device)
+    elif hyperparams['model_name'] == 'ResNet_PCA_Sparse_Mask':
+        model = ResNet_PCA_Sparse_Mask(n_res_block=hyperparams['n_res_block'], pca_channel= hyperparams['n_pca_channel']).to(device)
+    else :
+        print(f"Model {hyperparams['model_name']} not found")
+        break
     # Define loss function and optimizer
-    criterion = SCLoss(lmbda=hyperparams['lmbda'], delta = hyperparams['delta'])
+    if hyperparams['model_name'] == 'ResNet_PCA_Sparse_Mask':
+        criterion = SCLoss_PCA_Sparse_Mask(lmbda=hyperparams['lmbda'], delta = hyperparams['delta'])
+    elif hyperparams['model_name']=='ResNet_PCA':
+        criterion = SCLoss_PCA(lmbda=hyperparams['lmbda'], delta = hyperparams['delta'])
+    else :
+        criterion = SCLoss(lmbda=hyperparams['lmbda'],delta=hyperparams['delta'])
     optimizer = optim.Adam(model.parameters(), lr = hyperparams['lr'])
 
     # init comet 
@@ -75,7 +149,10 @@ for i in [5e-5]:
         checkpoint_dir = f'{folder_name}'
         latest_checkpoint_path = find_latest_checkpoint(checkpoint_dir)
         if latest_checkpoint_path is not None:
-            model, optimizer, last_epoch, loss, recon_losses, regu_losses = load_checkpoint(model, optimizer, latest_checkpoint_path)
+            if 'PCA' in hyperparams['model_name'] :
+                model, optimizer, last_epoch, loss, recon_losses, regu_losses, pca_recon_losses = load_checkpoint(model,hyperparams['model_name'], optimizer, latest_checkpoint_path)
+            else :
+                model, optimizer, last_epoch, loss, recon_losses, regu_losses = load_checkpoint(model,hyperparams['model_name'], optimizer, latest_checkpoint_path)
         else :
             print('no checkpoint found')
             if not os.path.exists(test_result_path):
@@ -83,15 +160,15 @@ for i in [5e-5]:
             if not os.path.exists(train_result_path):
                 os.mkdir(train_result_path)            
                 
-
-    test(model,test_dataloader,criterion,device,last_epoch,exp, test_result_path)
-    
-    for epoch in range(last_epoch, hyperparams['epoch']):
+   
+    for epoch in range(last_epoch, hyperparams['epoch']+1):
         try:
-            train_loss, train_loss_detail = train(model,train_dataloader,criterion,optimizer,epoch,device,exp, train_result_path)
             if epoch %5 == 0 :
                 test(model,test_dataloader,criterion,device,epoch,exp, test_result_path)
-                if epoch % 10 == 0:
+                
+            train_loss, train_loss_detail = train(model,train_dataloader,criterion,optimizer,epoch,device,exp, train_result_path)
+            if epoch % 10 == 0 :#and epoch!=0:
+                if 'PCA' in hyperparams['model_name']:
                     torch.save({
                         'epoch': epoch,
                         'model_state_dict': model.state_dict(),
@@ -100,6 +177,15 @@ for i in [5e-5]:
                         'recon_losses': train_loss_detail['Reconstruction'],
                         'regu_losses': train_loss_detail['Regularization'],    
                         'pca_recon_losses': train_loss_detail['Basis_Recon'],        
+                        }, f'{folder_name}/{epoch}.pth')
+                else :
+                    torch.save({
+                        'epoch': epoch,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': train_loss,
+                        'recon_losses': train_loss_detail['Reconstruction'],
+                        'regu_losses': train_loss_detail['Regularization'],    
                         }, f'{folder_name}/{epoch}.pth')
         except KeyboardInterrupt:
             exp.end()
