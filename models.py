@@ -5,6 +5,166 @@ from torch.autograd import Variable
 from torch.nn.utils import weight_norm
 from torchsummary import summary
 from utils import gen_train_mask
+import time
+# C for convoluton / P for partial convoluton/ Z for Zero padding/ R for Reflection padding
+class CZP(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.krnl_size = 7
+        self.decoder = nn.Conv2d(1,32,self.krnl_size,bias=False)
+        self.pconv = nn.Conv2d(32,1,self.krnl_size,padding=(6,6),bias=False)
+        self.wn_pconv = weight_norm(self.pconv,name='weight')
+        self.wn_pconv.weight_g = nn.Parameter(torch.ones_like(self.wn_pconv.weight_g))
+        self.wn_pconv.weight_g.requires_grad = False 
+        self.avgpool = nn.AvgPool2d(self.krnl_size,stride=1)
+        #Partial Convolution Module 
+    def forward(self, x, mode = 'train'):
+        p = self.krnl_size-1
+        x = self.decoder(x)
+        latent = x
+        n,c,h,w = x.shape
+        mask = torch.ones(n,1,h,w).to(x)
+        x = self.wn_pconv(x)
+        mask = self.avgpool(F.pad(mask,(p,p,p,p)))
+        # print(self.wn.weight_g, self.wn.weight_g.requires_grad)
+        # return x, latent
+        features ={
+            'latent': latent,
+        }
+        return x/mask, features
+
+class ZCZC(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.krnl_size = 7
+        self.conv1 = nn.Conv2d(1,32,self.krnl_size,padding=(3,3),bias=False)
+        self.conv2 = nn.Conv2d(32,1,self.krnl_size,padding=(3,3),bias=False)
+        #Partial Convolution Module 
+    def forward(self, x, mode = 'train'):
+        x = self.conv1(x)
+        latent = x
+        n,c,h,w = x.shape
+        x = self.conv2(x)
+        # print(self.wn.weight_g, self.wn.weight_g.requires_grad)
+        # return x, latent
+        features ={
+            'latent': latent,
+        }
+        return x, features
+
+class RCRC(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.krnl_size = 7
+        self.conv1 = nn.Conv2d(1,32,self.krnl_size,padding=(3,3), padding_mode='reflect',bias=False)
+        self.conv2 = nn.Conv2d(32,1,self.krnl_size,padding=(3,3), padding_mode='reflect',bias=False)
+        #Partial Convolution Module 
+    def forward(self, x, mode = 'train'):
+        # p = self.krnl_size-1
+        x = self.conv1(x)
+        latent = x
+        # n,c,h,w = x.shape
+        x = self.conv2(x)
+        # print(self.wn.weight_g, self.wn.weight_g.requires_grad)
+        # return x, latent
+        features ={
+            'latent': latent,
+        }
+        return x, features
+
+class CZC(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.krnl_size = 7
+        self.conv1 = nn.Conv2d(1,32,self.krnl_size,bias=False)
+        self.conv2 = nn.Conv2d(32,1,self.krnl_size,padding=(6,6),bias=False)
+        #Partial Convolution Module 
+    def forward(self, x, mode = 'train'):
+        p = self.krnl_size-1
+        x = self.conv1(x)
+        latent = x
+        n,c,h,w = x.shape
+        x = self.conv2(x)
+        # print(self.wn.weight_g, self.wn.weight_g.requires_grad)
+        # return x, latent
+        features ={
+            'latent': latent,
+        }
+        return x, features
+    
+class CRC(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.krnl_size = 7
+        self.conv1 = nn.Conv2d(1,32,self.krnl_size,bias=False)
+        self.conv2 = nn.Conv2d(32,1,self.krnl_size,padding=(6,6), padding_mode='reflect',bias=False)
+        #Partial Convolution Module 
+    def forward(self, x, mode = 'train'):
+        p = self.krnl_size-1
+        x = self.conv1(x)
+        latent = x
+        n,c,h,w = x.shape
+        x = self.conv2(x)
+        # print(self.wn.weight_g, self.wn.weight_g.requires_grad)
+        # return x, latent
+        features ={
+            'latent': latent,
+        }
+        return x, features
+    
+class ZPZP(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.krnl_size = 7
+        self.pconv = nn.Conv2d(1,32,self.krnl_size,padding=(3,3),bias=False)
+        self.pconv1 = nn.Conv2d(32,1,self.krnl_size,padding=(3,3),bias=False)
+        self.wn_pconv = weight_norm(self.pconv,name='weight')
+        self.wn_pconv.weight_g = nn.Parameter(torch.ones_like(self.wn_pconv.weight_g))
+        self.wn_pconv.weight_g.requires_grad = False 
+        self.wn_pconv1 = weight_norm(self.pconv1,name='weight')
+        self.wn_pconv1.weight_g = nn.Parameter(torch.ones_like(self.wn_pconv1.weight_g))
+        self.wn_pconv1.weight_g.requires_grad = False 
+        #Partial Convolution Module 
+        self.avgpool = nn.AvgPool2d(self.krnl_size,stride=1)
+        
+    def forward(self, x, mode = 'train'):
+        p = 3
+        n,c,h,w = x.shape
+        mask = torch.ones(n,1,h,w).to(x)
+        x = self.pconv(x)
+        mask = self.avgpool(F.pad(mask,(p,p,p,p)))
+        x = x/mask 
+        latent = x
+        x = self.pconv1(x)
+        features ={
+            'latent': latent,
+        }
+        return x/mask, features
+class ZCZP(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.krnl_size = 7
+        self.conv = nn.Conv2d(1,32,self.krnl_size,padding=(3,3),bias=False)
+        self.pconv = nn.Conv2d(32,1,self.krnl_size,padding=(3,3),bias=False)
+        self.wn_pconv = weight_norm(self.pconv,name='weight')
+        self.wn_pconv.weight_g = nn.Parameter(torch.ones_like(self.wn_pconv.weight_g))
+        self.wn_pconv.weight_g.requires_grad = False 
+        #Partial Convolution Module 
+        self.avgpool = nn.AvgPool2d(self.krnl_size,stride=1)
+        
+    def forward(self, x, mode = 'train'):
+        p = 3
+        n,c,h,w = x.shape
+        mask = torch.ones(n,1,h,w).to(x)
+        x = self.conv(x)
+        mask = self.avgpool(F.pad(mask,(p,p,p,p)))
+        latent = x
+        x = self.pconv(x)
+        features ={
+            'latent': latent,
+        }
+        return x/mask, features
+
 
 class SimpleNet_no_PConv(nn.Module):
     def __init__(self, *args, **kwargs) -> None:
@@ -218,7 +378,33 @@ class ResNet_PCA(nn.Module):
             'mask' : mask,
         }
         return x, features
-    
+
+def speed_test(model, input):
+    starttime = time.time()
+    for i in range(1000):
+        output, features = model(input,mode='test')
+    endtime = time.time()
+    print(endtime-starttime)
+    return 
+
 if __name__ == "__main__":
-    model = ResNet_PCA(n_res_block=3)
-    summary(model, (1,128,128))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    for model_name in ['SimpleNet','CZC', 'CRC', 'ZCZC','RCRC','ZPZP']:
+        if model_name == 'SimpleNet':
+            model = SimpleNet()
+        if model_name == 'ZCZC':
+            model = ZCZC()
+        elif model_name == 'RCRC':
+            model = RCRC()
+        elif model_name == 'CZC':
+            model = CZC()
+        elif model_name == 'CRC':
+            model = CRC()
+        elif model_name == 'ZPZP':
+            model = ZPZP()    
+        print(model_name)
+        summary(model, (1,128,128))
+        # model = model.to(device)
+        # input = torch.rand((1,1,256,256)).to(device)
+        # speed_test(model,input)

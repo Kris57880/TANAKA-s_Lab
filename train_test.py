@@ -111,9 +111,9 @@ def test(model, dataloader, criterion, device, epoch, exp, output_dir = 'result'
         output, features = model(input,mode='test')
         loss, loss_detail = criterion(output, input, features, mode = 'test')
         # test code 
-        original_norm = torch.norm(input)
-        feature_norm = torch.norm(features['pca_latent'])+torch.norm(features['latent'])
-        print(f'image {i}: original norm: {original_norm}, feature norm: {feature_norm}')
+        # original_norm = torch.norm(input)
+        # feature_norm = torch.norm(features['pca_latent'])+torch.norm(features['latent'])
+        # print(f'image {i}: original norm: {original_norm}, feature norm: {feature_norm}')
         # end of test 
         if i in save_list:
             save_image(input.detach().cpu().squeeze(), f'{output_dir}/input_{i}.png')
@@ -164,4 +164,3 @@ def test(model, dataloader, criterion, device, epoch, exp, output_dir = 'result'
     exp.log_metric('Test_Basis_Recon_Loss', np.mean(s_recon_basis_loss),step=epoch)
 
     print(f"Test Epoch {epoch+1}, Loss: {np.mean(s_loss):.4f}, Recon_Loss: {np.mean(s_recon_loss):.4f}, Regu_Loss: {np.mean(s_regu_loss):.4f}")
-

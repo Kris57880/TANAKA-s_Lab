@@ -14,7 +14,7 @@ class SCLoss(nn.Module):
             loss_norm = torch.norm(features['latent'])
         else : 
             loss_norm = torch.norm(features['latent'])
-        losses = {'Reconstruction':LR,'Regularization':loss_norm}
+        losses = {'Reconstruction':LR, 'Regularization':loss_norm}
         return LR+self.lmbda*loss_norm, losses
     
 class SCLoss_PCA(nn.Module):

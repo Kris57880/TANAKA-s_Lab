@@ -51,11 +51,6 @@ def train (model, dataloader, criterion, optimizer, epoch, device, exp, output_d
             exp.log_image(f'{output_dir}/input_{i}.png',name=f'train_{i}_target.png', step=epoch)
             exp.log_image(f'{output_dir}/output_{i}.png', name=f'train_{i}_output.png', step=epoch )
             exp.log_image(f'{output_dir}/feature_map_{i}.png', name=f'train_{i}_feature.png', step=epoch)
-            
-
-
-            
-            
             # plt.close('all')
     exp.log_metric('Train_Loss', np.mean(s_loss),step=epoch)
     exp.log_metric('Train_Recon_Loss', np.mean(s_recon_loss),step=epoch)
