@@ -1,8 +1,3 @@
-# Instructions about this Repo
-
-Status: Not Started
-Project: 出國交換 (https://www.notion.so/e4bc8bf379cf44bf8cd7b7b288a32eab?pvs=21)
-
 ### File Organization
 
 ```
